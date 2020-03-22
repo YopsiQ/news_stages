@@ -215,7 +215,7 @@ class HyperNewsTest(DjangoTest):
             urllib.request.HTTPCookieProcessor(self.cookie_jar))
         try:
             adding_page_response = opener.open(
-                f'http://localhost:{self.port}/news/adding_page/')
+                f'http://localhost:{self.port}/news/adding_page')
         except urllib.error.URLError:
             return CheckResult.false('Cannot connect to the adding_page.')
 
@@ -263,7 +263,7 @@ class HyperNewsTest(DjangoTest):
 
     def check_adding_page_main_link(self):
         self.__setup()
-        main_link = '/news/'
+        main_link = '/news'
 
         try:
             page = self.read_page(
@@ -284,7 +284,7 @@ class HyperNewsTest(DjangoTest):
 
     def check_news_page_main_link(self):
         self.__setup()
-        main_link = '/news/'
+        main_link = '/news'
 
         testing_news = self.news_data[0]
         link = testing_news['link']

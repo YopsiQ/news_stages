@@ -106,7 +106,7 @@ class HyperNewsTest(DjangoTest):
 
     def check_news_page_main_link(self):
         self.__setup()
-        main_link = '/news/'
+        main_link = '/news'
 
         testing_news = self.news_data[0]
         link = testing_news['link']
