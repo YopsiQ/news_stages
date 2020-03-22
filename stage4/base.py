@@ -55,7 +55,7 @@ class HyperNewsTest(DjangoTest):
     def check_main_header(self) -> CheckResult:
         self.__setup()
         try:
-            page = self.read_page(f'http://localhost:{self.port}/news')
+            page = self.read_page(f'http://localhost:{self.port}/news/')
         except urllib.error.URLError:
             return CheckResult.false(
                 'Cannot connect to the main page.'
@@ -81,7 +81,7 @@ class HyperNewsTest(DjangoTest):
         created_date_str = created_dt.strftime('%Y-%m-%d')
 
         try:
-            page = self.read_page(f'http://localhost:{self.port}/news/{link}')
+            page = self.read_page(f'http://localhost:{self.port}/news/{link}/')
         except urllib.error.URLError:
             return CheckResult.false(
                 'Cannot connect to the news page.'
@@ -125,7 +125,7 @@ class HyperNewsTest(DjangoTest):
 
         if adding_link not in links_from_page:
             return CheckResult.false(
-                f'Main page should contain <a> element with href {adding_link}'
+                f'Main page should contain <a> element with href {adding_link}/'
             )
 
         return CheckResult.true()
@@ -145,7 +145,7 @@ class HyperNewsTest(DjangoTest):
         created_list_str = [x.strftime('%Y-%m-%d') for x in created_list]
 
         try:
-            page = self.read_page(f'http://localhost:{self.port}/news')
+            page = self.read_page(f'http://localhost:{self.port}/news/')
         except urllib.error.URLError:
             return CheckResult.false(
                 'Cannot connect to the main page.'
@@ -215,7 +215,7 @@ class HyperNewsTest(DjangoTest):
             urllib.request.HTTPCookieProcessor(self.cookie_jar))
         try:
             adding_page_response = opener.open(
-                f'http://localhost:{self.port}/news/adding_page')
+                f'http://localhost:{self.port}/news/adding_page/')
         except urllib.error.URLError:
             return CheckResult.false('Cannot connect to the adding_page.')
 
@@ -246,7 +246,7 @@ class HyperNewsTest(DjangoTest):
                 'page')
 
         try:
-            page = self.read_page(f'http://localhost:{self.port}/news')
+            page = self.read_page(f'http://localhost:{self.port}/news/')
         except urllib.error.URLError:
             return CheckResult.false(
                 'Cannot connect to the main page.'
@@ -263,11 +263,11 @@ class HyperNewsTest(DjangoTest):
 
     def check_adding_page_main_link(self):
         self.__setup()
-        main_link = '/news'
+        main_link = '/news/'
 
         try:
             page = self.read_page(
-                f'http://localhost:{self.port}/news/adding_page')
+                f'http://localhost:{self.port}/news/adding_page/')
         except urllib.error.URLError:
             return CheckResult.false(
                 'Cannot connect to the adding_page.'
@@ -284,13 +284,13 @@ class HyperNewsTest(DjangoTest):
 
     def check_news_page_main_link(self):
         self.__setup()
-        main_link = '/news'
+        main_link = '/news/'
 
         testing_news = self.news_data[0]
         link = testing_news['link']
 
         try:
-            page = self.read_page(f'http://localhost:{self.port}/news/{link}')
+            page = self.read_page(f'http://localhost:{self.port}/news/{link}/')
         except urllib.error.URLError:
             return CheckResult.false(
                 'Cannot connect to the news page.'

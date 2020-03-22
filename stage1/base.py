@@ -41,7 +41,7 @@ class HyperNewsTest(DjangoTest):
     def check_main_header(self) -> CheckResult:
         self.__setup()
         try:
-            page = self.read_page(f'http://localhost:{self.port}/news')
+            page = self.read_page(f'http://localhost:{self.port}/news/')
         except urllib.error.URLError:
             return CheckResult.false(
                 'Cannot connect to the main page.'
