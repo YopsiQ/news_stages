@@ -1,0 +1,21 @@
+<h2>Hyper news</h2>
+
+<form action="/news/search/" method="get">
+    <input type="search" id="search_string" name="search_string" value="{{ search_string }}">
+    <input type="submit" value="search">
+</form>
+
+{% if news %}
+    {% for items in news %}
+        <h4>{{items.header}}</h4>
+        <ul>
+        {% for item in items.data %}
+            <li><a href="/news/{{ item.link }}/">{{ item.title }}</a></li>
+        {% endfor %}
+        </ul>
+    {% endfor %}
+{% else %}
+    <p>No news are available.</p>
+{% endif %}
+
+<a href="/news/adding_page">Add news</a>
