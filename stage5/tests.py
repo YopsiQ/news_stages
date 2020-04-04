@@ -9,6 +9,7 @@ class HyperNewsTestRunner(HyperNewsTest):
         return [
             # 1 task
             TestCase(attach=self.check_server),
+            TestCase(attach=self.check_coming_soon_page),
             # 2 task
             TestCase(attach=self.check_news_page),
             TestCase(attach=self.check_news_page_main_link),
@@ -20,6 +21,7 @@ class HyperNewsTestRunner(HyperNewsTest):
             TestCase(attach=self.check_adding_page_main_link),
             # 5 task
             TestCase(attach=self.check_main_page_search),
+            TestCase(attach=self.check_coming_soon_page_redirect),
         ]
 
     def check(self, reply, attach):

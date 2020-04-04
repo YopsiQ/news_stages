@@ -55,6 +55,52 @@ class HyperNewsTest(DjangoTest):
         with open(self.news_file_name, 'w') as f:
             json.dump(self.news_data, f)
 
+    def check_coming_soon_page(self) -> CheckResult:
+        self.__setup()
+        try:
+            page = self.read_page(f'http://localhost:{self.port}/')
+        except urllib.error.URLError:
+            return CheckResult.false(
+                'Cannot connect to the "Coming soon" page.')
+
+        opener = urllib.request.build_opener(
+            urllib.request.HTTPCookieProcessor(self.cookie_jar))
+        try:
+            response = opener.open(f'http://localhost:{self.port}/')
+        except urllib.error.URLError:
+            return CheckResult.false(
+                'Cannot connect to the "Coming soon" page.')
+
+        coming_soon_text = 'Coming soon'
+
+        # response.url for the backward compatibility
+        if (coming_soon_text not in page
+                and response.url != f'http://localhost:{self.port}/news/'):
+            return CheckResult.false(
+                '"Coming soon" page should contain "Coming soon" text'
+            )
+
+        return CheckResult.true()
+
+    def check_coming_soon_page_redirect(self) -> CheckResult:
+        self.__setup()
+
+        opener = urllib.request.build_opener(
+            urllib.request.HTTPCookieProcessor(self.cookie_jar))
+        try:
+            response = opener.open(f'http://localhost:{self.port}/')
+        except urllib.error.URLError:
+            return CheckResult.false(
+                'Cannot connect to the "Coming soon" page.')
+
+        if response.url != f'http://localhost:{self.port}/news/':
+            return CheckResult.false(
+                f'"Coming soon" page should redirects '
+                f'to the http://localhost:{self.port}/news/'
+            )
+
+        return CheckResult.true()
+
     def check_main_header(self) -> CheckResult:
         self.__setup()
         try:
