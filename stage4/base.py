@@ -37,17 +37,17 @@ class HyperNewsTest(DjangoTest):
             'created': '2020-02-09 14:15:10',
             'text': 'Text of the news 1',
             'title': 'News 1',
-            'link': '1'
+            'link': 1
         }, {
             'created': '2020-02-10 14:15:10',
             'text': 'Text of the news 2',
             'title': 'News 2',
-            'link': '2'
+            'link': 2
         }, {
             'created': '2020-02-09 16:15:10',
             'text': 'Text of the news 3',
             'title': 'News 3',
-            'link': '3'
+            'link': 3
         }]
         with open(self.news_file_name, 'w') as f:
             json.dump(self.news_data, f)
@@ -77,9 +77,6 @@ class HyperNewsTest(DjangoTest):
         link = testing_news['link']
         created = testing_news['created']
 
-        created_dt = datetime.strptime(created, '%Y-%m-%d %H:%M:%S')
-        created_date_str = created_dt.strftime('%Y-%m-%d')
-
         try:
             page = self.read_page(f'http://localhost:{self.port}/news/{link}/')
         except urllib.error.URLError:
@@ -101,11 +98,11 @@ class HyperNewsTest(DjangoTest):
                 'of the text field from json file.'
             )
 
-        if created_date_str not in page_paragraphs:
+        if created not in page_paragraphs:
             return CheckResult.false(
                 'News page should contain <p> element with the data '
                 'of the created field from json file '
-                'in the format: "2099-09-09".'
+                'in the format: "%Y-%m-%d %H:%M:%S".'
             )
 
         return CheckResult.true()
@@ -230,7 +227,7 @@ class HyperNewsTest(DjangoTest):
             create_response = opener.open(
                 f'http://localhost:{self.port}/news/create/',
                 data=urllib.parse.urlencode({
-                    'title': new_news['title'],
+                        'title': new_news['title'],
                     'text': new_news['text'],
                     'csrfmiddlewaretoken': csrf_options[0],
                 }).encode()
@@ -300,7 +297,65 @@ class HyperNewsTest(DjangoTest):
 
         if main_link not in links_from_page:
             return CheckResult.false(
-                f'Adding page should contain <a> element with href {main_link}'
+                f'News page should contain <a> element with href {main_link}'
             )
+
+        return CheckResult.true()
+
+    def check_main_page_search(self):
+        self.__setup()
+        search_string = '2'
+        news_data = copy.deepcopy(self.news_data)
+
+        for news in news_data:
+            created_date = datetime.strptime(news['created'],
+                                             '%Y-%m-%d %H:%M:%S') \
+                .date()
+            news['created_date_str'] = created_date.strftime('%Y-%m-%d')
+
+        all_headers = set((x['created_date_str'] for x in news_data))
+        visible_headers = set((x['created_date_str'] for x in news_data
+                               if search_string in x['title']))
+        invisible_headers = all_headers - visible_headers
+        visible_titles = [x['title'] for x in news_data
+                          if search_string in x['title']]
+        invisible_titles = [x['title'] for x in news_data
+                            if search_string not in x['title']]
+
+        try:
+            page = self.read_page(f'http://localhost:{self.port}/news/search/'
+                                  f'?search_string={search_string}')
+        except urllib.error.URLError:
+            return CheckResult.false(
+                'Cannot connect to the search page.'
+            )
+
+        h4_headers = re.findall(self.H4_PATTERN, page)
+
+        for header in visible_headers:
+            if header not in h4_headers:
+                return CheckResult.false(
+                    f'Search page should contain headers with found news'
+                )
+
+        for header in invisible_headers:
+            if header in h4_headers:
+                return CheckResult.false(
+                    f'Search page should not contain headers with unfound news'
+                )
+
+        titles = re.findall(self.TEXT_LINK_PATTERN, page)
+
+        for title in visible_titles:
+            if title not in titles:
+                return CheckResult.false(
+                    f'Search page should contain unfound news'
+                )
+
+        for title in invisible_titles:
+            if title in titles:
+                return CheckResult.false(
+                    f'Search page should contain found news'
+                )
 
         return CheckResult.true()

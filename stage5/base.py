@@ -37,17 +37,17 @@ class HyperNewsTest(DjangoTest):
             'created': '2020-02-09 14:15:10',
             'text': 'Text of the news 1',
             'title': 'News 1',
-            'link': '1'
+            'link': 1
         }, {
             'created': '2020-02-10 14:15:10',
             'text': 'Text of the news 2',
             'title': 'News 2',
-            'link': '2'
+            'link': 2
         }, {
             'created': '2020-02-09 16:15:10',
             'text': 'Text of the news 3',
             'title': 'News 3',
-            'link': '3'
+            'link': 3
         }]
         with open(self.news_file_name, 'w') as f:
             json.dump(self.news_data, f)
@@ -77,9 +77,6 @@ class HyperNewsTest(DjangoTest):
         link = testing_news['link']
         created = testing_news['created']
 
-        created_dt = datetime.strptime(created, '%Y-%m-%d %H:%M:%S')
-        created_date_str = created_dt.strftime('%Y-%m-%d')
-
         try:
             page = self.read_page(f'http://localhost:{self.port}/news/{link}/')
         except urllib.error.URLError:
@@ -101,11 +98,11 @@ class HyperNewsTest(DjangoTest):
                 'of the text field from json file.'
             )
 
-        if created_date_str not in page_paragraphs:
+        if created not in page_paragraphs:
             return CheckResult.false(
                 'News page should contain <p> element with the data '
                 'of the created field from json file '
-                'in the format: "2099-09-09".'
+                'in the format: "%Y-%m-%d %H:%M:%S".'
             )
 
         return CheckResult.true()
@@ -300,7 +297,7 @@ class HyperNewsTest(DjangoTest):
 
         if main_link not in links_from_page:
             return CheckResult.false(
-                f'Adding page should contain <a> element with href {main_link}'
+                f'News page should contain <a> element with href {main_link}'
             )
 
         return CheckResult.true()
