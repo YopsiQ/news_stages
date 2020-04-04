@@ -9,11 +9,11 @@ class HyperNewsTestRunner(HyperNewsTest):
         return [
             # 1 task
             TestCase(attach=self.check_server),
-            TestCase(attach=self.check_main_header),
             # 2 task
             TestCase(attach=self.check_news_page),
             TestCase(attach=self.check_news_page_main_link),
             # 3 task
+            TestCase(attach=self.check_main_header),
             TestCase(attach=self.check_main_page),
             # 4 task
             TestCase(attach=self.check_creating_news),
