@@ -32,6 +32,9 @@ class HyperNewsTest(DjangoTest):
                                                     self.news_file_name)
         super().__init__(*args, **kwargs)
 
+    def __stripped_list(self, list):
+        return [item.strip() for item in list]
+
     def __setup(self):
         self.news_data = [{
             'created': '2020-02-09 14:15:10',
@@ -62,6 +65,7 @@ class HyperNewsTest(DjangoTest):
             )
 
         h2_headers = re.findall(self.H2_PATTERN, page)
+        h2_headers = self.__stripped_list(h2_headers)
         main_header = 'Hyper news'
 
         if main_header not in h2_headers:
@@ -85,7 +89,9 @@ class HyperNewsTest(DjangoTest):
             )
 
         page_headers = re.findall(self.H2_PATTERN, page)
+        page_headers = self.__stripped_list(page_headers)
         page_paragraphs = re.findall(self.PARAGRAPH_PATTERN, page)
+        page_paragraphs = self.__stripped_list(page_paragraphs)
         if testing_news['title'] not in page_headers:
             return CheckResult.false(
                 'News page should contain <h2> element with the data '
@@ -149,6 +155,7 @@ class HyperNewsTest(DjangoTest):
             )
 
         h4_headers = re.findall(self.H4_PATTERN, page)
+        h4_headers = self.__stripped_list(h4_headers)
         filtered_h4 = list(filter(lambda x: x in created_list_str, h4_headers))
 
         if filtered_h4 != created_list_str:
@@ -186,7 +193,7 @@ class HyperNewsTest(DjangoTest):
                 response_data.append({
                     'created_date_str': h4,
                     'link': news[0],
-                    'title': news[1]
+                    'title': news[1].strip()
                 })
 
         if response_data != file_data:
@@ -331,6 +338,7 @@ class HyperNewsTest(DjangoTest):
             )
 
         h4_headers = re.findall(self.H4_PATTERN, page)
+        h4_headers = self.__stripped_list(h4_headers)
 
         for header in visible_headers:
             if header not in h4_headers:
@@ -345,6 +353,7 @@ class HyperNewsTest(DjangoTest):
                 )
 
         titles = re.findall(self.TEXT_LINK_PATTERN, page)
+        titles = self.__stripped_list(titles)
 
         for title in visible_titles:
             if title not in titles:
