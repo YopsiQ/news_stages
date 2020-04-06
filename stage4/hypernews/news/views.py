@@ -7,36 +7,38 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.template import loader
+from django.views.generic import View
 
 
-def adding_page(request):
-    template = loader.get_template('news/adding_page.html')
+class CreateView(View):
 
-    return HttpResponse(template.render({}, request))
+    def get(self, request):
+        template = loader.get_template('news/create.html')
 
+        return HttpResponse(template.render({}, request))
 
-def create(request):
-    with open(settings.NEWS_JSON_PATH, 'r') as file_object:
-        try:
-            news_data = json.load(file_object)
-        except JSONDecodeError:
-            news_data = []
+    def post(self, request):
+        with open(settings.NEWS_JSON_PATH, 'r') as file_object:
+            try:
+                news_data = json.load(file_object)
+            except JSONDecodeError:
+                news_data = []
 
-    links = [int(x['link']) for x in news_data]
-    new_link = str(max(links)+1) if links else '1'
+        links = [int(x['link']) for x in news_data]
+        new_link = str(max(links)+1) if links else '1'
 
-    fresh_news = {
-        'created': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-        'link': new_link,
-        'title': request.POST.get('title'),
-        'text': request.POST.get('text'),
-    }
-    news_data.append(fresh_news)
+        fresh_news = {
+            'created': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'link': new_link,
+            'title': request.POST.get('title'),
+            'text': request.POST.get('text'),
+        }
+        news_data.append(fresh_news)
 
-    with open(settings.NEWS_JSON_PATH, 'w') as file_object:
-        json.dump(news_data, file_object)
+        with open(settings.NEWS_JSON_PATH, 'w') as file_object:
+            json.dump(news_data, file_object)
 
-    return redirect('index')
+        return redirect('index')
 
 
 def index(request):

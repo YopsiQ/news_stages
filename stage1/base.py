@@ -19,9 +19,9 @@ class HyperNewsTest(DjangoTest):
     GROUPS_SECOND_PATTERN = (
         '''<a[^>]+href=['"]([a-zA-Z\d/_]+)['"][^>]*>(.+?)</a>'''
     )
-    H2_PATTERN = '<h2>(.*)</h2>'
-    H4_PATTERN = '<h4>(.*)</h4>'
-    PARAGRAPH_PATTERN = '<p>(.*)</p>'
+    H2_PATTERN = '<h2>(.+?)</h2>'
+    H4_PATTERN = '<h4>(.+?)</h4>'
+    PARAGRAPH_PATTERN = '<p>(.+?)</p>'
     TEXT_LINK_PATTERN = '''<a[^>]+href=['"][a-zA-Z\d/_]+['"][^>]*>(.+?)</a>'''
     cookie_jar = http.cookiejar.CookieJar()
 
@@ -110,7 +110,7 @@ class HyperNewsTest(DjangoTest):
                 'Cannot connect to the main page.'
             )
 
-        h2_headers = re.findall(self.H2_PATTERN, page)
+        h2_headers = re.findall(self.H2_PATTERN, page, re.S)
         h2_headers = self.__stripped_list(h2_headers)
         main_header = 'Hyper news'
 
@@ -134,9 +134,9 @@ class HyperNewsTest(DjangoTest):
                 'Cannot connect to the news page.'
             )
 
-        page_headers = re.findall(self.H2_PATTERN, page)
+        page_headers = re.findall(self.H2_PATTERN, page, re.S)
         page_headers = self.__stripped_list(page_headers)
-        page_paragraphs = re.findall(self.PARAGRAPH_PATTERN, page)
+        page_paragraphs = re.findall(self.PARAGRAPH_PATTERN, page, re.S)
         page_paragraphs = self.__stripped_list(page_paragraphs)
         if testing_news['title'] not in page_headers:
             return CheckResult.false(
@@ -159,9 +159,9 @@ class HyperNewsTest(DjangoTest):
 
         return CheckResult.true()
 
-    def check_main_page_adding_link(self):
+    def check_main_page_create_link(self):
         self.__setup()
-        adding_link = '/news/addings_page/'
+        create_link = '/news/create/'
 
         try:
             page = self.read_page(f'http://localhost:{self.port}/news')
@@ -170,11 +170,12 @@ class HyperNewsTest(DjangoTest):
                 'Cannot connect to the main page.'
             )
 
-        links_from_page = re.findall(self.COMMON_LINK_PATTERN, page)
+        links_from_page = re.findall(self.COMMON_LINK_PATTERN, page, re.S)
+        links_from_page = self.__stripped_list(links_from_page)
 
-        if adding_link not in links_from_page:
+        if create_link not in links_from_page:
             return CheckResult.false(
-                f'Main page should contain <a> element with href {adding_link}/'
+                f'Main page should contain <a> element with href {create_link}'
             )
 
         return CheckResult.true()
@@ -200,7 +201,7 @@ class HyperNewsTest(DjangoTest):
                 'Cannot connect to the main page.'
             )
 
-        h4_headers = re.findall(self.H4_PATTERN, page)
+        h4_headers = re.findall(self.H4_PATTERN, page, re.S)
         h4_headers = self.__stripped_list(h4_headers)
         filtered_h4 = list(filter(lambda x: x in created_list_str, h4_headers))
 
@@ -264,17 +265,17 @@ class HyperNewsTest(DjangoTest):
         opener = urllib.request.build_opener(
             urllib.request.HTTPCookieProcessor(self.cookie_jar))
         try:
-            adding_page_response = opener.open(
-                f'http://localhost:{self.port}/news/adding_page/')
+            create_page_response = opener.open(
+                f'http://localhost:{self.port}/news/create/')
         except urllib.error.URLError:
-            return CheckResult.false('Cannot connect to the adding_page.')
+            return CheckResult.false('Cannot connect to the create page.')
 
-        adding_page = adding_page_response.read()
+        create_page = create_page_response.read()
 
-        csrf_options = re.findall(self.CSRF_PATTERN, adding_page)
+        csrf_options = re.findall(self.CSRF_PATTERN, create_page)
         if not csrf_options:
             return CheckResult.false(
-                'Missing csrf_token in the adding_page form')
+                'Missing csrf_token in the create page form')
 
         try:
             create_response = opener.open(
@@ -302,32 +303,34 @@ class HyperNewsTest(DjangoTest):
                 'Cannot connect to the main page.'
             )
 
-        links_from_page = re.findall(self.TEXT_LINK_PATTERN, page)
+        links_from_page = re.findall(self.TEXT_LINK_PATTERN, page, re.S)
+        links_from_page = self.__stripped_list(links_from_page)
 
         for title in titles:
             if title not in links_from_page:
                 return CheckResult.false(
-                    f'After creating news main page cant find {title}')
+                    f'After creating news main page can\'t find {title}')
 
         return CheckResult.true()
 
-    def check_adding_page_main_link(self):
+    def check_create_page_main_link(self):
         self.__setup()
         main_link = '/news/'
 
         try:
             page = self.read_page(
-                f'http://localhost:{self.port}/news/adding_page/')
+                f'http://localhost:{self.port}/news/create/')
         except urllib.error.URLError:
             return CheckResult.false(
-                'Cannot connect to the adding_page.'
+                'Cannot connect to the create page.'
             )
 
-        links_from_page = re.findall(self.COMMON_LINK_PATTERN, page)
+        links_from_page = re.findall(self.COMMON_LINK_PATTERN, page, re.S)
+        links_from_page = self.__stripped_list(links_from_page)
 
         if main_link not in links_from_page:
             return CheckResult.false(
-                f'Adding page should contain <a> element with href {main_link}'
+                f'Create page should contain <a> element with href {main_link}'
             )
 
         return CheckResult.true()
@@ -346,7 +349,8 @@ class HyperNewsTest(DjangoTest):
                 'Cannot connect to the news page.'
             )
 
-        links_from_page = re.findall(self.COMMON_LINK_PATTERN, page)
+        links_from_page = re.findall(self.COMMON_LINK_PATTERN, page, re.S)
+        links_from_page = self.__stripped_list(links_from_page)
 
         if main_link not in links_from_page:
             return CheckResult.false(
@@ -357,7 +361,7 @@ class HyperNewsTest(DjangoTest):
 
     def check_main_page_search(self):
         self.__setup()
-        search_string = '2'
+        q = '2'
         news_data = copy.deepcopy(self.news_data)
 
         for news in news_data:
@@ -368,22 +372,21 @@ class HyperNewsTest(DjangoTest):
 
         all_headers = set((x['created_date_str'] for x in news_data))
         visible_headers = set((x['created_date_str'] for x in news_data
-                               if search_string in x['title']))
+                               if q in x['title']))
         invisible_headers = all_headers - visible_headers
         visible_titles = [x['title'] for x in news_data
-                          if search_string in x['title']]
+                          if q in x['title']]
         invisible_titles = [x['title'] for x in news_data
-                            if search_string not in x['title']]
+                            if q not in x['title']]
 
         try:
-            page = self.read_page(f'http://localhost:{self.port}/news/search/'
-                                  f'?search_string={search_string}')
+            page = self.read_page(f'http://localhost:{self.port}/news/?q={q}')
         except urllib.error.URLError:
             return CheckResult.false(
                 'Cannot connect to the search page.'
             )
 
-        h4_headers = re.findall(self.H4_PATTERN, page)
+        h4_headers = re.findall(self.H4_PATTERN, page, re.S)
         h4_headers = self.__stripped_list(h4_headers)
 
         for header in visible_headers:
@@ -398,7 +401,7 @@ class HyperNewsTest(DjangoTest):
                     f'Search page should not contain headers with unfound news'
                 )
 
-        titles = re.findall(self.TEXT_LINK_PATTERN, page)
+        titles = re.findall(self.TEXT_LINK_PATTERN, page, re.S)
         titles = self.__stripped_list(titles)
 
         for title in visible_titles:

@@ -1,4 +1,4 @@
-<form action="/news/add/" method="post">
+<form action="/news/create/" method="post">
     {% csrf_token %}
     {{ form }}
     <table>
@@ -20,7 +20,7 @@
       </tr>
       <tr>
         <td>
-          <input type="submit" value="add">
+          <input type="submit" value="create">
         </td>
       </tr>
     </table>

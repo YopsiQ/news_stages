@@ -1,7 +1,7 @@
 <h2>Hyper news</h2>
 
 <form action="/news/search/" method="get">
-    <input type="search" id="search_string" name="search_string" value="{{ search_string }}">
+    <input type="search" id="q" name="q" value="{{ q }}">
     <input type="submit" value="search">
 </form>
 
@@ -18,4 +18,4 @@
     <p>No news are available.</p>
 {% endif %}
 
-<a href="/news/adding_page">Add news</a>
+<a href="/news/create/">Create news</a>

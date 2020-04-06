@@ -16,9 +16,10 @@ class HyperNewsTestRunner(HyperNewsTest):
             # 3 task
             TestCase(attach=self.check_main_header),
             TestCase(attach=self.check_main_page),
+            TestCase(attach=self.check_main_page_create_link),
             # 4 task
             TestCase(attach=self.check_creating_news),
-            TestCase(attach=self.check_adding_page_main_link),
+            TestCase(attach=self.check_create_page_main_link),
             # 5 task
             TestCase(attach=self.check_main_page_search),
             TestCase(attach=self.check_coming_soon_page_redirect),
