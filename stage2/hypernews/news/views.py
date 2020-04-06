@@ -1,18 +1,3 @@
-import json
+from django.shortcuts import render
 
-from django.conf import settings
-from django.http import HttpResponse
-from django.template import loader
-
-
-def detail(request, news_link):
-    with open(settings.NEWS_JSON_PATH, 'r') as file_object:
-        news_data = json.load(file_object)
-
-    news_item = [x for x in news_data if x['link'] == news_link][0]
-
-    template = loader.get_template('news/detail.html')
-    context = {
-       'item': news_item
-    }
-    return HttpResponse(template.render(context, request))
+# Create your views here.
