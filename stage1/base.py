@@ -407,13 +407,13 @@ class HyperNewsTest(DjangoTest):
         for title in visible_titles:
             if title not in titles:
                 return CheckResult.false(
-                    f'Search page should contain unfound news'
+                    f'Search page should contain found news'
                 )
 
         for title in invisible_titles:
             if title in titles:
                 return CheckResult.false(
-                    f'Search page should contain found news'
+                    f'Search page should not contain unfound news'
                 )
 
         return CheckResult.true()
